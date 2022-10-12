@@ -1,0 +1,1 @@
+export { LomQuizzRoutingModule } from "./lom-quizz-router.module"

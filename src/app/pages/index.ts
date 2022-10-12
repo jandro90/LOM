@@ -1,0 +1,1 @@
+export { LomQuizzModule } from "./lom-quizz/lom-quizz.module";
