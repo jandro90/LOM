@@ -1,1 +1,72 @@
-<p>Lom quizz main works!</p>
+<div class="container">
+    <h2 class="text-center m-5">LOM Quizz APP</h2>
+
+    <!-- Quizz Form -->
+    <div class="d-flex justify-content-center" [formGroup]="quizzForm.formGroup">
+        <!-- Loader Spinner -->
+        <p-progressSpinner *ngIf="isProcessingData"></p-progressSpinner>
+        <!-- Quizz Form Content -->
+        <p-card *ngIf="!isCalculated && !isProcessingData" header="Question {{ currentStep }} / {{ totalSteps }}" [style]="{width: '460px'}" styleClass="p-card-shadow" class="text-center" >
+            
+                <p>{{ formData[currentStep - 1].description }}</p>
+    
+            <div *ngFor="let formItem of formData; let i = index">
+                <ng-container *ngIf="i === (currentStep - 1)">
+                    <!-- text input  -->
+                    <ng-container *ngIf="formItem.type === inputTypes.text">
+                        <input type="text" pInputText  [formControlName]="formItem.id"/>
+                    </ng-container>
+                    <!-- number input  -->
+                    <ng-container *ngIf="formItem.type === inputTypes.number">
+                        <p-inputNumber formControlName="{{formItem.id}}"></p-inputNumber>
+                    </ng-container>                    
+                    <!-- radio inputs -->
+                    <ng-container *ngIf="formItem.type === inputTypes.radio">
+                        <div class="field-radiobutton" *ngFor="let radioInput of formItem.multipleOptions">
+                            <p-radioButton name="{{formItem.id}}" value="{{radioInput.value}}" formControlName="{{formItem.id}}" inputId="{{formItem.id}}"></p-radioButton>
+                            <label [for]="formItem.id">{{ radioInput.label }}</label>
+                        </div>
+                    </ng-container>
+                    <!-- checkbox inputs -->
+                    <ng-container *ngIf="formItem.type === inputTypes.checkbox">
+                        <div class="field-checkbox" *ngFor="let checkboxInput of formItem.multipleOptions">
+                            <p-checkbox formControlName="{{formItem.id}}" value="{{checkboxInput.value}}" [binary]="false" inputId="{{formItem.id}}"></p-checkbox>
+                            <label [for]="formItem.id">{{ checkboxInput.label }}</label>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </div>
+    
+    
+                <ng-template pTemplate="footer">
+                    <p-button class="mr-2" label="Back" icon="pi pi-arrow-left" (click)="backStep()" styleClass="p-button-secondary" [disabled]="currentStep <= 1"></p-button>
+                    <p-button *ngIf="currentStep !== totalSteps" label="Next" icon="pi pi-arrow-right" (click)="nextStep()" [disabled]="quizzForm.formGroup.controls[formData[currentStep - 1].id].invalid"></p-button>
+                    <p-button *ngIf="currentStep === totalSteps" label="Calculate" icon="pi pi-arrow-right" (click)="calculateScore()"></p-button>
+
+                </ng-template>
+        </p-card>
+    </div>
+
+    <!-- Result Quizz -->
+    <div class="d-flex justify-content-center" [formGroup]="quizzForm.formGroup" *ngIf="isCalculated">
+        <p-card header="Score Result" [style]="{width: '860px'}" styleClass="p-card-shadow" class="text-center" >
+            
+            <div *ngIf="score >= minimumScoreSuccess" class="text-success">
+                <p>Quizz Success! Your Score is: {{ score }}.</p>
+            </div>
+
+            <div *ngIf="score < minimumScoreSuccess" class="text-danger">
+                <p>Quizz Failed! Your Score is: {{ score }}. The minimum score is {{ minimumScoreSuccess }}.</p>
+            </div>
+
+                <div>
+                    <p-messages [(value)]="scoreMessages" [enableService]="false"></p-messages>
+                </div>
+    
+    
+                <ng-template pTemplate="footer">
+                    <p-button label="Restart" icon="pi pi-refresh" (click)="restart()"></p-button>
+                </ng-template>
+        </p-card>
+    </div>
+</div>
